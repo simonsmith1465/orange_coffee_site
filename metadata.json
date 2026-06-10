@@ -1,0 +1,6 @@
+{
+  "name": "Orange Coffee Suwanee",
+  "description": "A modern, warm, and cozy Korean-style coffee shop website in Suwanee, GA. Featuring specialty drinks like Matcha Cream Strawberry Latte, Tiramisu Latte, custom ordering options, customer reviews, photo gallery, and embedded Google Maps.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
