@@ -1,13 +1,1575 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orange Coffee Suwanee | Korean-Inspired Specialty Cafe</title>
+  
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js CDN for robust dynamic single-file state management -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Lucide Icons for aesthetic modern UI iconography -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            'cafe': {
+              orange: '#EA580C',
+              'orange-light': '#FFEDD5',
+              warm: '#FAF7F2',
+              charcoal: '#1C1917',
+              accent: '#FFF8F0',
+            }
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            scaleIn: {
+              '0%': { transform: 'scale(0.95)', opacity: '0' },
+              '100%': { transform: 'scale(1)', opacity: '1' },
+            }
+          },
+          animation: {
+            fadeIn: 'fadeIn 0.2s ease-out forwards',
+            scaleIn: 'scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Styling for premium custom scrollbars & standard browser overrides */
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    /* Smooth page scroll behaviour */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body class="bg-cafe-warm/40 text-cafe-charcoal min-h-screen flex flex-col justify-between selection:bg-cafe-orange/20 selection:text-cafe-orange font-sans antialiased"
+      x-data="cafeAppState()" 
+      x-init="initApp()">
+
+  <!-- 1. Header / Navigation bar -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-cafe-orange/5 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo / Identity -->
+      <a href="#" @click.prevent="setView('home')" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-full bg-cafe-orange flex items-center justify-center text-white shadow-md shadow-cafe-orange/20 group-hover:scale-105 duration-200">
+          <svg class="w-5.5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-display font-extrabold text-lg sm:text-xl tracking-tight text-cafe-charcoal leading-none">
+            Orange Coffee
+          </span>
+          <span class="font-mono text-[9px] uppercase tracking-wider text-cafe-orange font-bold mt-0.5">
+            Suwanee, Georgia
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden md:flex items-center gap-1.5 bg-cafe-warm/80 p-1.5 rounded-full border border-stone-200/40">
+        <button @click="setView('home')" :class="currentView === 'home' ? 'bg-cafe-orange text-white' : 'hover:bg-cafe-orange-light hover:text-cafe-orange text-stone-600'" class="px-4.5 py-2 rounded-full font-display font-bold text-xs uppercase tracking-wider transition-all duration-150">
+          Home
+        </button>
+        <button @click="setView('menu')" :class="currentView === 'menu' ? 'bg-cafe-orange text-white' : 'hover:bg-cafe-orange-light hover:text-cafe-orange text-stone-600'" class="px-4.5 py-2 rounded-full font-display font-bold text-xs uppercase tracking-wider transition-all duration-150">
+          Specialties
+        </button>
+        <button @click="setView('reviews')" :class="currentView === 'reviews' ? 'bg-cafe-orange text-white' : 'hover:bg-cafe-orange-light hover:text-cafe-orange text-stone-600'" class="px-4.5 py-2 rounded-full font-display font-bold text-xs uppercase tracking-wider transition-all duration-150">
+          Reviews
+        </button>
+        <button @click="setView('gallery')" :class="currentView === 'gallery' ? 'bg-cafe-orange text-white' : 'hover:bg-cafe-orange-light hover:text-cafe-orange text-stone-600'" class="px-4.5 py-2 rounded-full font-display font-bold text-xs uppercase tracking-wider transition-all duration-150">
+          Gallery
+        </button>
+        <button @click="setView('contact')" :class="currentView === 'contact' ? 'bg-cafe-orange text-white' : 'hover:bg-cafe-orange-light hover:text-cafe-orange text-stone-600'" class="px-4.5 py-2 rounded-full font-display font-bold text-xs uppercase tracking-wider transition-all duration-150">
+          Find Us
+        </button>
+      </nav>
+
+      <!-- Cart Trigger Button & Mobile Menu CTA -->
+      <div class="flex items-center gap-3">
+        <!-- Order Now direct link -->
+        <button @click="setView('order-now')" :class="currentView === 'order-now' ? 'bg-cafe-charcoal text-white' : 'bg-transparent text-cafe-orange border-cafe-orange/30 hover:bg-cafe-orange/5'" class="hidden sm:inline-flex border px-4 py-2 rounded-xl font-display text-xs font-bold uppercase tracking-wider transition-all active:scale-95 duration-150 cursor-pointer">
+          Order Ahead
+        </button>
+
+        <!-- Dynamic Cart Basket Toggle -->
+        <button @click="toggleCart()" class="relative bg-cafe-charcoal hover:bg-cafe-orange text-white p-3 rounded-2xl flex items-center justify-center transition-all duration-200 shadow-sm active:scale-95 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <template x-if="cartCount > 0">
+            <span class="absolute -top-1.5 -right-1.5 bg-cafe-orange text-white font-mono text-[9px] font-bold w-5 h-5 rounded-full border-2 border-white flex items-center justify-center animate-bounce duration-1000" x-text="cartCount"></span>
+          </template>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Sub-header (Scrollable slide under) -->
+    <div class="md:hidden flex items-center gap-2 px-4 py-2 border-t border-stone-100 overflow-x-auto scrollbar-hide bg-stone-50/50">
+      <button @click="setView('home')" :class="currentView === 'home' ? 'bg-cafe-orange text-white' : 'bg-white text-stone-600 border border-stone-200'" class="px-4 py-1.5 rounded-full font-display font-semibold text-xs uppercase shrink-0 transition-all">Home</button>
+      <button @click="setView('menu')" :class="currentView === 'menu' ? 'bg-cafe-orange text-white' : 'bg-white text-stone-600 border border-stone-200'" class="px-4 py-1.5 rounded-full font-display font-semibold text-xs uppercase shrink-0 transition-all">Specialties</button>
+      <button @click="setView('reviews')" :class="currentView === 'reviews' ? 'bg-cafe-orange text-white' : 'bg-white text-stone-600 border border-stone-200'" class="px-4 py-1.5 rounded-full font-display font-semibold text-xs uppercase shrink-0 transition-all">Reviews</button>
+      <button @click="setView('gallery')" :class="currentView === 'gallery' ? 'bg-cafe-orange text-white' : 'bg-white text-stone-600 border border-stone-200'" class="px-4 py-1.5 rounded-full font-display font-semibold text-xs uppercase shrink-0 transition-all">Gallery</button>
+      <button @click="setView('contact')" :class="currentView === 'contact' ? 'bg-cafe-orange text-white' : 'bg-white text-stone-600 border border-stone-200'" class="px-4 py-1.5 rounded-full font-display font-semibold text-xs uppercase shrink-0 transition-all">Find Us</button>
+      <button @click="setView('order-now')" :class="currentView === 'order-now' ? 'bg-cafe-charcoal text-white' : 'bg-white text-cafe-orange border border-cafe-orange/20'" class="px-4 py-1.5 rounded-full font-display font-semibold text-xs uppercase shrink-0 transition-all">Order Ahead</button>
+    </div>
+  </header>
+
+  <!-- 2. Main content router screen flow -->
+  <main class="flex-grow">
+    
+    <!-- 2A. HOME: Immersive Bento Grid Section -->
+    <div x-show="currentView === 'home'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 animate-fadeIn">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        
+        <!-- Bento Block 1: Hero Media Spotlight (7 cols, 5 rows) -->
+        <div class="col-span-12 md:col-span-7 bg-stone-200 rounded-3xl overflow-hidden relative border border-stone-200 min-h-[380px] md:min-h-[480px] group shadow-xs hover:shadow-md transition-all duration-300">
+          <div class="w-full h-full bg-[url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center group-hover:scale-[1.03] transition-transform duration-700 absolute inset-0"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent flex flex-col justify-end p-6 md:p-8 text-white">
+            <span class="text-orange-400 font-mono text-xs font-bold mb-1.5 uppercase tracking-widest">Suwanee's Finest Cozy Cafe</span>
+            <h2 class="text-3xl sm:text-4.5xl md:text-5xl font-serif leading-tight mb-4 italic font-medium tracking-tight">
+              Experience the warmth of a Korean-inspired café.
+            </h2>
+            <p class="text-xs sm:text-sm text-stone-200 max-w-md mb-6 leading-relaxed">
+              Handcrafted specialty lattes, premium organic Uji matcha layers, fresh buttery pastries, and quiet, spacious study-friendly spaces in Gwinnett.
+            </p>
+            <div class="flex flex-wrap gap-3">
+              <button @click="setView('menu')" class="bg-white hover:bg-orange-500 hover:text-white text-stone-900 px-6 py-2.5 rounded-full font-display font-bold text-xs tracking-wider uppercase transition-all duration-150 cursor-pointer shadow-sm">
+                View Full Menu
+              </button>
+              <button @click="isStoryOpen = true" class="bg-transparent border border-white hover:bg-white/15 text-white px-6 py-2.5 rounded-full font-display font-bold text-xs tracking-wider uppercase transition-all duration-150 cursor-pointer">
+                Our Story
+              </button>
+            </div>
+          </div>
+          <!-- Real-time open flag -->
+          <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-xs px-3.5 py-1.5 rounded-full shadow-sm border border-stone-200/40 flex items-center gap-2">
+            <span class="w-2s h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span class="font-mono text-[10px] text-stone-700 font-bold uppercase tracking-wider">Open Today until 8:30 PM</span>
+          </div>
+        </div>
+
+        <!-- Bento Block 2: Quick Pick Popular Specialties (5 cols) -->
+        <div class="col-span-12 md:col-span-5 bg-orange-100/90 rounded-3xl p-6 border border-orange-200/75 flex flex-col justify-between hover:shadow-sm transition-all duration-300">
+          <div>
+            <h3 class="text-lg font-display font-black mb-4 flex items-center gap-2 text-orange-950">
+              <span class="w-2.5 h-2.5 bg-orange-500 rounded-full inline-block animate-ping"></span>
+              Popular Right Now
+            </h3>
+            
+            <div class="space-y-3.5">
+              <!-- Item 1 -->
+              <div @click="selectItemToCustomize('matcha-strawberry')" class="flex justify-between items-center bg-white/70 hover:bg-white/95 p-3.5 rounded-2xl transition-all duration-200 cursor-pointer group shadow-2xs border border-orange-200/20">
+                <div class="pr-2">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-stone-900 text-sm group-hover:text-orange-600 transition-colors">Matcha Cream Strawberry Latte</span>
+                    <span class="bg-green-50 text-green-700 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0">Best</span>
+                  </div>
+                  <p class="text-xs text-stone-500 mt-0.5">House-made puree & premium matcha cream</p>
+                </div>
+                <span class="font-mono font-bold text-orange-600 shrink-0 bg-white px-2.5 py-1 rounded-lg text-sm border border-orange-200/35 group-hover:bg-orange-500 group-hover:text-white group-hover:border-transparent transition-all">
+                  $6.75
+                </span>
+              </div>
+
+              <!-- Item 2 -->
+              <div @click="selectItemToCustomize('tiramisu-latte')" class="flex justify-between items-center bg-white/70 hover:bg-white/95 p-3.5 rounded-2xl transition-all duration-200 cursor-pointer group shadow-2xs border border-orange-200/20">
+                <div class="pr-2">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-stone-900 text-sm group-hover:text-orange-600 transition-colors">Tiramisu Latte</span>
+                    <span class="bg-amber-50 text-amber-800 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0">Cream</span>
+                  </div>
+                  <p class="text-xs text-stone-500 mt-0.5">Espresso, cocoa & mascarpone cream foam</p>
+                </div>
+                <span class="font-mono font-bold text-orange-600 shrink-0 bg-white px-2.5 py-1 rounded-lg text-sm border border-orange-200/35 group-hover:bg-orange-500 group-hover:text-white group-hover:border-transparent transition-all">
+                  $6.50
+                </span>
+              </div>
+
+              <!-- Item 3 -->
+              <div @click="selectItemToCustomize('croissant-butter')" class="flex justify-between items-center bg-white/70 hover:bg-white/95 p-3.5 rounded-2xl transition-all duration-200 cursor-pointer group shadow-2xs border border-orange-200/20">
+                <div class="pr-2">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-stone-900 text-sm group-hover:text-orange-600 transition-colors">Golden Butter Croissant</span>
+                    <span class="bg-orange-50 text-orange-850 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0">Daily</span>
+                  </div>
+                  <p class="text-xs text-stone-500 mt-0.5">Classic French-style butter croissant baked daily</p>
+                </div>
+                <span class="font-mono font-bold text-orange-600 shrink-0 bg-white px-2.5 py-1 rounded-lg text-sm border border-orange-200/35 group-hover:bg-orange-500 group-hover:text-white group-hover:border-transparent transition-all">
+                  $3.95
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="text-[10px] text-orange-950/60 font-mono text-center mt-4 pt-2 border-t border-orange-250/20">
+            ⚡ Tap/click any item to customize & order immediately!
+          </div>
+        </div>
+
+        <!-- Bento Block 3: Skip Line Order CTA (5 cols) -->
+        <div @click="setView('order-now')" class="col-span-12 md:col-span-5 bg-stone-900 rounded-3xl flex items-center justify-between px-6 py-4.5 text-white hover:bg-stone-850 cursor-pointer transition-all border border-stone-800 shadow-xs hover:shadow-md duration-300 group">
+          <span class="text-xs sm:text-sm font-medium text-stone-200 group-hover:text-white">Skip the line and order ahead for pickup</span>
+          <span class="text-orange-500 font-display font-extrabold uppercase text-[10px] tracking-widest flex items-center gap-1 transition-colors group-hover:text-orange-400">
+            Start Order →
+          </span>
+        </div>
+
+        <!-- Bento Block 4: Cozy Aesthetic Ambiance (3 cols) -->
+        <div class="col-span-12 md:col-span-3 bg-white rounded-3xl p-6 border border-stone-150 flex flex-col justify-between hover:shadow-xs transition-all duration-300" id="bento-about-card">
+          <div>
+            <div class="mb-4 text-orange-500">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h4 class="font-display font-bold text-lg mb-2 text-stone-900 leading-snug">
+              Spacious seating, free Wi-Fi & daylight.
+            </h4>
+            <p class="text-xs sm:text-sm text-stone-500 leading-relaxed">
+              The perfect corner for study sessions, morning meetings, or catching up with friends in a quiet, modern atmosphere with beautiful Korean-style lounge accents.
+            </p>
+          </div>
+          <div class="mt-6 pt-3 border-t border-stone-100 flex items-center justify-between">
+            <span class="text-[9px] uppercase font-mono tracking-wider text-stone-400 font-bold">Vibe: Cozy & Study-friendly</span>
+            <button @click="isStoryOpen = true" class="text-orange-500 hover:text-orange-600 font-mono text-[9px] font-bold tracking-widest uppercase hover:underline">
+              Our Story →
+            </button>
+          </div>
+        </div>
+
+        <!-- Bento Block 5: Verified Review Highlight (4 cols) -->
+        <div @click="setView('reviews')" class="col-span-12 md:col-span-4 bg-[#FFF8F0] rounded-3xl p-6 border border-orange-100/60 italic flex items-center gap-4 hover:shadow-xs transition-all duration-300 cursor-pointer group">
+          <div class="w-12 h-12 bg-orange-200 rounded-full flex-shrink-0 overflow-hidden border-2 border-orange-100 shadow-2xs group-hover:scale-105 duration-300">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80" alt="Sarah Kim" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <p class="text-xs leading-relaxed text-stone-700 font-sans">
+              "The best matcha strawberry latte in Georgia! Soft, aesthetic seating area, lightning fast Wi-Fi and hospitable service. Will be a regular."
+            </p>
+            <p class="text-[9px] font-bold mt-2 uppercase text-orange-600 font-mono tracking-wider">
+              — Sarah Kim, Verified Customer
+            </p>
+          </div>
+        </div>
+
+        <!-- Bento Block 6: Contact & Live Route Map (5 cols) -->
+        <div class="col-span-12 md:col-span-5 bg-stone-100/90 rounded-3xl p-6 border border-stone-200 flex flex-col justify-between hover:shadow-xs transition-all duration-300">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex flex-col justify-between space-y-4">
+              <div>
+                <h4 class="font-bold mb-1.5 uppercase text-[9px] tracking-widest text-stone-400 font-mono">Location</h4>
+                <p class="text-xs sm:text-sm text-stone-800 leading-normal" x-text="businessInfo.address"></p>
+              </div>
+              <div>
+                <h4 class="font-bold mb-1 uppercase text-[9px] tracking-widest text-stone-400 font-mono">Bar Hours</h4>
+                <div class="space-y-0.5 font-mono text-[10px] text-stone-600">
+                  <template x-for="item in businessInfo.hours">
+                    <div>
+                      <span x-text="item.days" class="font-semibold text-stone-700"></span>: <span x-text="item.time"></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+              <div class="pt-2">
+                <a href="tel:4702661113" class="text-xs font-bold text-stone-800 hover:text-orange-600 flex items-center gap-1.5 duration-150">
+                  <span class="text-orange-500 font-bold">📞</span>
+                  <span x-text="businessInfo.phone"></span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Custom Directions Graphic CTA -->
+            <a href="https://maps.google.com/?q=3890+Lawrenceville-Suwanee+Rd,+Suwanee,+GA+30024" target="_blank" rel="noopener noreferrer" class="bg-stone-300 rounded-2xl relative overflow-hidden h-36 sm:h-full block group shadow-2xs hover:shadow-xs">
+              <div class="absolute inset-0 bg-sky-100 flex flex-col items-center justify-center text-stone-500 group-hover:bg-sky-150/80 transition-colors">
+                <div class="w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-md transform group-hover:scale-110 duration-300 relative z-10 font-bold">
+                  📍
+                </div>
+                <span class="font-display text-[9px] text-stone-600 font-bold uppercase mt-2">Get Directions Map</span>
+                
+                <!-- Graphic abstract lines representing streets -->
+                <div class="absolute inset-x-0 top-1/2 h-1 bg-white/40 -translate-y-1/2 rotate-12"></div>
+                <div class="absolute inset-y-0 left-1/2 w-1.5 bg-white/40 -translate-x-1/2 -rotate-45"></div>
+              </div>
+            </a>
+          </div>
+          <div class="text-[10px] text-stone-400 font-mono pt-3 mt-4 border-t border-stone-200/60">
+            🚗 Plenty of free parking spots instantly available in front of the lobby entrance.
+          </div>
+        </div>
+
+        <!-- Bento Block 7: Photo Mini-Grid & Gallery Entrance (4 cols) -->
+        <div class="col-span-12 md:col-span-4 grid grid-cols-2 gap-3">
+          <div class="bg-stone-200 rounded-2xl overflow-hidden aspect-square relative group border border-stone-100">
+            <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&q=80&w=300" alt="Espresso brew" class="w-full h-full object-cover group-hover:scale-105 duration-300">
+          </div>
+          <div class="bg-stone-200 rounded-2xl overflow-hidden aspect-square relative group border border-stone-100">
+            <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&q=80&w=300" alt="Aesthetic cups" class="w-full h-full object-cover group-hover:scale-105 duration-300">
+          </div>
+          <div class="bg-stone-200 rounded-2xl overflow-hidden aspect-square relative group border border-stone-100">
+            <img src="https://images.unsplash.com/photo-1559925393-8be0ec41b50d?auto=format&fit=crop&q=80&w=300" alt="Cafe study spaces" class="w-full h-full object-cover group-hover:scale-105 duration-300">
+          </div>
+          <button @click="setView('gallery')" class="bg-cafe-orange hover:bg-cafe-charcoal text-white rounded-2xl flex flex-col items-center justify-center text-[10px] font-bold uppercase tracking-wider cursor-pointer font-display transition-all duration-200 hover:scale-[1.02] shadow-sm select-none active:scale-95 text-center p-3">
+             <span class="text-lg">📷</span>
+             <span class="mt-1">View Gallery</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2B. MENU / ORDER: Specialties Catalog -->
+    <div x-show="currentView === 'menu' || currentView === 'order-now'" x-cloak class="py-16 sm:py-20 bg-cafe-warm/40 relative animate-fadeIn">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Interactive Banner when ordering ahead -->
+        <template x-if="currentView === 'order-now'">
+          <div class="bg-orange-50 border border-orange-150 px-5 py-3.5 rounded-2xl mb-12 flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-cafe-orange shadow-2xs">
+            <span class="animate-pulse">✨</span>
+            <span>Customize and build your pickup cart! Click "Customize" or "Add" on any treats below.</span>
+          </div>
+        </template>
+
+        <!-- Dynamic Header -->
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 bg-cafe-orange-light text-cafe-orange rounded-full font-mono text-xs font-semibold uppercase tracking-wider">
+            <span>☕</span>
+            <span>Orange Coffee Craft Menu</span>
+          </div>
+          <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-cafe-charcoal leading-tight">
+            Explore Handcrafted Perfection
+          </h2>
+          <p class="text-sm sm:text-base text-cafe-charcoal/70 leading-relaxed">
+            Every layered milk drink, matcha latte & double-shot espresso is micro-whisked on order for thick, velvety sweet milk foam. Accompanied by fresh croffles & butter croissants daily.
+          </p>
+        </div>
+
+        <!-- Filter & Search Controls Deck -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-stone-100 mb-12 space-y-6">
+          <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <!-- Search bar -->
+            <div class="relative w-full md:max-w-md">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-cafe-charcoal/40">🔍</span>
+              <input type="text" 
+                     placeholder="Search Matcha, Tiramisu, Croissants..." 
+                     x-model="searchQuery" 
+                     class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-cafe-warm font-sans text-sm text-cafe-charcoal placeholder-cafe-charcoal/35 focus:outline-none focus:ring-2 focus:ring-cafe-orange/40 transition-shadow border-none">
+            </div>
+
+            <!-- Best Sellers Toggle -->
+            <button @click="filterPopularOnly = !filterPopularOnly" 
+                    :class="filterPopularOnly ? 'bg-orange-50 border-orange-200 text-cafe-orange' : 'bg-transparent text-stone-500 border-stone-200'"
+                    class="w-full md:w-auto px-5 py-3 border rounded-2xl flex items-center justify-center gap-2 font-display text-xs font-bold uppercase tracking-wider transition-colors">
+              <span>🔥</span>
+              <span>Popular Best-Sellers Only</span>
+            </button>
+          </div>
+
+          <!-- Horizontal Category Tabs -->
+          <div class="border-t border-stone-100 pt-6 flex gap-2 overflow-x-auto scrollbar-hide py-1">
+            <template x-for="cat in categories">
+              <button @click="activeCategory = cat.id" 
+                      :class="activeCategory === cat.id ? 'bg-cafe-orange text-white shadow-md shadow-cafe-orange/15' : 'bg-cafe-warm text-stone-600 border border-stone-150 hover:bg-orange-50 hover:text-cafe-orange'" 
+                      class="px-5 py-2.5 rounded-xl font-display text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-150"
+                      x-text="cat.label">
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <!-- Menu Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <template x-for="item in filteredMenuItems" :key="item.id">
+            <div class="bg-white rounded-3xl overflow-hidden border border-stone-150 hover:border-cafe-orange/30 shadow-xs hover:shadow-xl hover:shadow-cafe-orange/[0.03] transition-all duration-300 flex flex-col group relative">
+              
+              <!-- Popular Hot Flame badge -->
+              <template x-if="item.popular">
+                <div class="absolute top-4 left-4 z-10 bg-cafe-orange text-white font-mono text-[9px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-md">
+                  <span>🔥</span>
+                  <span>BEST SELLER</span>
+                </div>
+              </template>
+
+              <!-- Image block -->
+              <div class="relative aspect-[4/3] w-full bg-cafe-warm overflow-hidden">
+                <img :src="item.image" :alt="item.name" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
+              </div>
+
+              <!-- Body info -->
+              <div class="p-6 sm:p-7 flex-1 flex flex-col justify-between">
+                <div>
+                  <!-- Tags List -->
+                  <div class="flex flex-wrap gap-1.5 mb-2.5">
+                    <template x-for="tag in item.tags">
+                      <span class="font-mono text-[9px] uppercase tracking-wider bg-orange-50 text-cafe-orange font-bold px-2 py-0.5 rounded-md" x-text="tag"></span>
+                    </template>
+                  </div>
+
+                  <!-- Item Title -->
+                  <h3 class="font-display font-bold text-lg sm:text-xl text-cafe-charcoal group-hover:text-cafe-orange transition-colors duration-150 leading-snug" x-text="item.name"></h3>
+                  
+                  <!-- Description -->
+                  <p class="text-xs sm:text-sm text-stone-500 mt-2 leading-relaxed" x-text="item.description"></p>
+                </div>
+
+                <!-- Footer Base Price and Action -->
+                <div class="flex items-center justify-between pt-5 mt-5 border-t border-stone-100">
+                  <div>
+                    <span class="block font-mono text-[9px] uppercase font-semibold text-stone-400">Gourmet Price</span>
+                    <span class="font-mono font-bold text-base text-cafe-orange" x-text="'$' + item.price.toFixed(2)"></span>
+                  </div>
+
+                  <button @click="selectItemToCustomize(item.id)" class="px-4.5 py-2.5 rounded-xl font-display font-extrabold text-xs text-white bg-cafe-orange hover:bg-cafe-charcoal transition-colors cursor-pointer shadow-sm active:scale-95 duration-150">
+                    <span x-text="item.isCustomizable ? 'Customize' : 'Add to Cart'"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- No search matches screen -->
+        <template x-if="filteredMenuItems.length === 0">
+          <div class="text-center py-20 bg-white rounded-3xl border border-stone-150 max-w-lg mx-auto">
+            <span class="text-4xl block mb-4">☕</span>
+            <h3 class="font-display font-medium text-lg text-cafe-charcoal mb-1">No delicacies found</h3>
+            <p class="text-xs text-stone-500">Try checking other category headings or clear characters in your search bar.</p>
+          </div>
+        </template>
+
+      </div>
+    </div>
+
+    <!-- 2C. REVIEWS: Verified Customer Reviews -->
+    <div x-show="currentView === 'reviews'" x-cloak class="py-16 sm:py-20 bg-cafe-warm/40 animate-fadeIn">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Title area -->
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-50 text-cafe-orange rounded-full font-mono text-xs font-semibold uppercase tracking-wider">
+            <span>✨</span>
+            <span>Customer Testimonials</span>
+          </div>
+          <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-cafe-charcoal leading-tight">
+            Loved By Suwanee Neighbors
+          </h2>
+          <p class="text-sm sm:text-base text-cafe-charcoal/70 leading-relaxed">
+            See why our visitors rank us as the most hospitable study-friendly lounge in Suwanee. Authentic, real customer feedback from our regular community.
+          </p>
+        </div>
+
+        <!-- Review Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <template x-for="item in reviews" :key="item.id">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-stone-150 hover:border-cafe-orange/20 transition-all shadow-xs relative flex flex-col justify-between">
+              <div>
+                <!-- Rating Stars -->
+                <div class="flex gap-1 text-orange-500 mb-4 font-bold text-sm">
+                  <template x-for="star in Array.from({length: item.rating})">
+                    <span>★</span>
+                  </template>
+                </div>
+
+                <!-- Review Content -->
+                <p class="text-stone-600 text-xs sm:text-sm leading-relaxed italic" x-text="'&ldquo;' + item.comment + '&rdquo;'"></p>
+              </div>
+
+              <!-- Customer profile section -->
+              <div class="flex items-center gap-4 mt-6 pt-5 border-t border-stone-100">
+                <div class="w-11 h-11 rounded-full overflow-hidden bg-orange-100 shrink-0 border border-orange-200">
+                  <img :src="item.avatar" :alt="item.name" class="w-full h-full object-cover" />
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-display font-bold text-stone-900 text-sm" x-text="item.name"></span>
+                    <template x-if="item.verifiedPurchase">
+                      <span class="inline-block text-green-600 bg-green-50 font-mono text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded">Verified</span>
+                    </template>
+                  </div>
+                  <div class="text-[10px] text-stone-400 mt-1 flex flex-wrap items-center gap-2">
+                    <span x-text="item.date"></span>
+                    <span>•</span>
+                    <span class="text-cafe-orange/80" x-text="'Ordered: ' + item.drinkOrdered"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2D. GALLERY: Authentic Media Showcase -->
+    <div x-show="currentView === 'gallery'" x-cloak class="py-16 sm:py-20 bg-cafe-warm/40 animate-fadeIn">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-50 text-cafe-orange rounded-full font-mono text-xs font-semibold uppercase tracking-wider">
+            <span>📸</span>
+            <span>Aesthetic Snaps</span>
+          </div>
+          <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-cafe-charcoal leading-tight">
+            Venture Inside Our Cozy Lounges
+          </h2>
+          <p class="text-sm sm:text-base text-cafe-charcoal/70 leading-relaxed">
+            Take a look at our spacious lounge booths, warm wooden textures, premium espressos and matcha strawberry layers. We specialize in comforting, eye-safe atmospheres.
+          </p>
+        </div>
+
+        <!-- Filter tabs for Gallery -->
+        <div class="flex justify-center gap-2 mb-12 overflow-x-auto py-1 scrollbar-hide">
+          <button @click="galleryFilter = 'all'" :class="galleryFilter === 'all' ? 'bg-cafe-orange text-white shadow-sm' : 'bg-white border text-stone-500 hover:text-cafe-orange'" class="px-5 py-2 rounded-xl font-display font-semibold text-xs uppercase tracking-wider transition-all">All Photos</button>
+          <button @click="galleryFilter = 'interior'" :class="galleryFilter === 'interior' ? 'bg-cafe-orange text-white shadow-sm' : 'bg-white border text-stone-500 hover:text-cafe-orange'" class="px-5 py-2 rounded-xl font-display font-semibold text-xs uppercase tracking-wider transition-all">Cafe Interior</button>
+          <button @click="galleryFilter = 'drinks'" :class="galleryFilter === 'drinks' ? 'bg-cafe-orange text-white shadow-sm' : 'bg-white border text-stone-500 hover:text-cafe-orange'" class="px-5 py-2 rounded-xl font-display font-semibold text-xs uppercase tracking-wider transition-all">Espresso & Matchas</button>
+          <button @click="galleryFilter = 'pastries'" :class="galleryFilter === 'pastries' ? 'bg-cafe-orange text-white shadow-sm' : 'bg-white border text-stone-500 hover:text-cafe-orange'" class="px-5 py-2 rounded-xl font-display font-semibold text-xs uppercase tracking-wider transition-all">烘焙 Pastries</button>
+        </div>
+
+        <!-- Photos Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <template x-for="item in filteredGallery" :key="item.id">
+            <div class="bg-white rounded-3xl overflow-hidden aspect-square border border-stone-150 shadow-2xs group relative cursor-pointer">
+              <img :src="item.url" :alt="item.alt" class="w-full h-full object-cover group-hover:scale-105 duration-500" />
+              <!-- Elegant hover layout overlay -->
+              <div class="absolute inset-x-0 bottom-0 py-4 px-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end text-white">
+                <span class="font-mono text-[9px] uppercase text-orange-400 font-bold tracking-wider" x-text="item.category"></span>
+                <p class="text-xs mt-0.5" x-text="item.alt"></p>
+              </div>
+            </div>
+          </template>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2E. CONTACT: Find us, Directions, Operational hours -->
+    <div x-show="currentView === 'contact'" x-cloak class="py-16 sm:py-20 bg-cafe-warm/40 animate-fadeIn">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-50 text-cafe-orange rounded-full font-mono text-xs font-semibold uppercase tracking-wider">
+            <span>📍</span>
+            <span>Join us in Georgia</span>
+          </div>
+          <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-cafe-charcoal leading-tight">
+            We are waiting for you!
+          </h2>
+          <p class="text-sm sm:text-base text-cafe-charcoal/70 leading-relaxed">
+            Orange Coffee Suwanee is located right on Lawrenceville-Suwanee Road with simple, fast customer parking in the front lot. Remote-work study booths, high speed Wi-Fi, and cozy Korean pastries await.
+          </p>
+        </div>
+
+        <!-- Info Panels splits -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          
+          <!-- Column A details (5 cols) -->
+          <div class="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 border border-stone-150 flex flex-col justify-between space-y-8">
+            <div class="space-y-6">
+              
+              <!-- Address -->
+              <div class="flex gap-4">
+                <span class="text-2xl">📍</span>
+                <div>
+                  <h4 class="font-display font-bold text-stone-900 text-sm tracking-wider uppercase mb-1">Our Location Address</h4>
+                  <p class="text-xs sm:text-sm text-stone-500 leading-normal" x-text="businessInfo.address"></p>
+                </div>
+              </div>
+
+              <!-- Phone & Email -->
+              <div class="flex gap-4">
+                <span class="text-2xl">📞</span>
+                <div>
+                  <h4 class="font-display font-bold text-stone-900 text-sm tracking-wider uppercase mb-1">Contact Channels</h4>
+                  <p class="text-xs sm:text-sm text-stone-800">
+                    Phone: <a href="tel:4702661113" class="hover:text-cafe-orange font-semibold" x-text="businessInfo.phone"></a>
+                  </p>
+                  <p class="text-xs sm:text-sm text-stone-500 mt-1">
+                    Email: <span class="font-mono text-stone-600" x-text="businessInfo.email"></span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Operational Times -->
+              <div class="flex gap-4">
+                <span class="text-2xl">⏰</span>
+                <div>
+                  <h4 class="font-display font-bold text-stone-900 text-sm tracking-wider uppercase mb-1">Weekly Operating Hours</h4>
+                  <div class="space-y-1 mt-1 text-xs sm:text-sm text-stone-500">
+                    <template x-for="item in businessInfo.hours">
+                      <div class="flex justify-between gap-4">
+                        <span x-text="item.days" class="font-medium text-stone-700"></span>
+                        <span class="font-mono" x-text="item.time"></span>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Social coordinates -->
+            <div class="pt-6 border-t border-stone-100 flex items-center justify-between">
+              <span class="font-mono text-[9px] uppercase tracking-wider text-stone-400 font-bold">Follow Our Visual Story:</span>
+              <div class="flex gap-3">
+                <a :href="businessInfo.socials.instagram" target="_blank" class="text-xs font-bold text-cafe-orange hover:underline font-mono">Instagram</a>
+                <a :href="businessInfo.socials.facebook" target="_blank" class="text-xs font-bold text-cafe-orange hover:underline font-mono">Facebook</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column B map embedding mock (7 cols) -->
+          <div class="lg:col-span-7 bg-stone-100 rounded-3xl overflow-hidden border border-stone-200 min-h-[300px] sm:min-h-[400px] relative flex flex-col items-center justify-center text-center">
+            <!-- Simulated High Fidelity Route Finder Visual instead of bulky iframes -->
+            <div class="absolute inset-0 bg-sky-50 flex flex-col items-center justify-center p-6">
+              <div class="w-14 h-14 bg-cafe-orange text-white rounded-full flex items-center justify-center shadow-lg animate-bounce text-xl font-bold">
+                📍
+              </div>
+              <h3 class="font-display font-black text-xl text-stone-900 mt-4 leading-none">Find us in Suwanee, GA</h3>
+              <p class="text-xs text-stone-500 max-w-sm mt-2 leading-relaxed">
+                Clicking the directions button below launches Google Maps with routes from your GPS directly to Lawrenceville-Suwanee Road coordinates.
+              </p>
+              
+              <a href="https://maps.google.com/?q=3890+Lawrenceville-Suwanee+Rd,+Suwanee,+GA+30024" target="_blank" rel="noopener noreferrer" class="mt-6 bg-stone-900 text-white font-display text-xs font-bold tracking-wider uppercase px-6 py-3 rounded-full hover:bg-cafe-orange transition-all shadow-sm active:scale-95 duration-150">
+                Launch Route Finder Map
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 3. ORDER SIMULATOR: Modular Shopping & Customization drawers -->
+  <div>
+    
+    <!-- Drawer 3A: Cart Panel Overlay -->
+    <div x-show="isCartOpen" x-cloak class="fixed inset-0 z-50 overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+      <div class="absolute inset-0 overflow-hidden">
+        <!-- Background dark glass -->
+        <div @click="setIsCartOpen(false)" class="absolute inset-0 bg-stone-900/65 backdrop-blur-sm transition-opacity" aria-hidden="true"></div>
+
+        <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+          <div class="pointer-events-auto w-screen max-w-md transform transition-all duration-300">
+            
+            <div class="flex h-full flex-col bg-white shadow-2xl overflow-y-auto">
+              
+              <!-- Draw Header -->
+              <div class="px-6 py-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
+                <h2 class="text-lg font-display font-extrabold text-cafe-charcoal flex items-center gap-2">
+                  <span>🛒</span>
+                  <span>Pickup Cart</span>
+                </h2>
+                <button @click="setIsCartOpen(false)" class="text-stone-400 hover:text-stone-700 bg-stone-100 hover:bg-stone-200/60 p-2 rounded-full transition-colors cursor-pointer">
+                  ✕
+                </button>
+              </div>
+
+              <!-- Cart List items -->
+              <div class="flex-1 overflow-y-auto px-6 py-6 divide-y divide-stone-100">
+                
+                <!-- If Cart is empty -->
+                <template x-if="cart.length === 0">
+                  <div class="text-center py-20 flex flex-col items-center justify-center h-full space-y-4">
+                    <span class="text-4xl">🛍️</span>
+                    <h3 class="font-display font-medium text-stone-700 text-base">Your Basket is Empty</h3>
+                    <p class="text-xs text-stone-400 max-w-xs leading-relaxed">Explore Suwanee's premium Matchas, Tiramisus & Sweets to load items.</p>
+                    <button @click="setIsCartOpen(false); setView('menu');" class="bg-cafe-orange text-white text-xs font-bold font-display px-5 py-2.5 rounded-xl transition-all uppercase tracking-wider shadow-xs hover:bg-cafe-charcoal">
+                      Browse Menu
+                    </button>
+                  </div>
+                </template>
+
+                <!-- If items exist -->
+                <template x-for="entry in cart" :key="entry.id">
+                  <div class="py-5 flex items-start gap-4">
+                    <img :src="entry.item.image" :alt="entry.item.name" class="w-16 h-16 rounded-xl object-cover bg-stone-150 border border-stone-200 shrink-0">
+                    <div class="flex-1">
+                      <div class="flex justify-between items-start gap-2">
+                        <h4 class="font-display font-bold text-sm text-cafe-charcoal leading-snug" x-text="entry.item.name"></h4>
+                        <button @click="removeItem(entry.id)" class="text-stone-400 hover:text-orange-500 font-mono text-xs select-none">✕</button>
+                      </div>
+                      
+                      <!-- Customization parameters info -->
+                      <div class="text-[10px] text-stone-400 mt-1 space-y-0.5">
+                        <div x-text="'Size: ' + entry.size"></div>
+                        <template x-if="entry.iceLevel">
+                          <div x-text="'Ice: ' + entry.iceLevel"></div>
+                        </template>
+                        <template x-if="entry.sweetness">
+                          <div x-text="'Sweetness: ' + entry.sweetness"></div>
+                        </template>
+                        <template x-if="entry.milkOption">
+                          <div x-text="'Milk: ' + entry.milkOption"></div>
+                        </template>
+                        <template x-if="entry.notes">
+                          <div class="italic text-orange-600/70" x-text="'Notes: ' + entry.notes"></div>
+                        </template>
+                      </div>
+
+                      <!-- Quantities control and calculations -->
+                      <div class="flex items-center justify-between mt-3">
+                        <div class="flex items-center gap-1.5 bg-stone-100/80 p-1 rounded-lg">
+                          <button @click="updateQuantity(entry.id, -1)" class="w-6 h-6 rounded bg-white font-bold text-xs hover:bg-stone-50 select-none flex items-center justify-center">-</button>
+                          <span class="font-mono text-xs font-bold px-2" x-text="entry.quantity"></span>
+                          <button @click="updateQuantity(entry.id, 1)" class="w-6 h-6 rounded bg-white font-bold text-xs hover:bg-stone-50 select-none flex items-center justify-center">+</button>
+                        </div>
+                        <span class="font-mono font-bold text-xs text-cafe-orange" x-text="'$' + (entry.priceAtOrder * entry.quantity).toFixed(2)"></span>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+
+              </div>
+
+              <!-- If items exist, show totaling actions -->
+              <template x-if="cart.length > 0">
+                <div class="border-t border-stone-100 px-6 py-6 space-y-4 bg-stone-50/70">
+                  <div class="space-y-1 font-mono text-xs text-stone-500">
+                    <div class="flex justify-between">
+                      <span>Subtotal</span>
+                      <span class="text-stone-800" x-text="'$' + subtotal.toFixed(2)"></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Sales Tax (Suwanee ~6%)</span>
+                      <span class="text-stone-800" x-text="'$' + salesTax.toFixed(2)"></span>
+                    </div>
+                    <div class="flex justify-between font-bold text-base text-cafe-charcoal border-t border-stone-200/55 pt-2 mt-2">
+                      <span>Grand Total</span>
+                      <span class="text-cafe-orange" x-text="'$' + grandTotal.toFixed(2)"></span>
+                    </div>
+                  </div>
+
+                  <!-- Checkout drawer trigger -->
+                  <button @click="launchCheckout()" class="w-full bg-cafe-orange hover:bg-cafe-charcoal text-white py-3.5 rounded-2xl font-display font-bold text-xs tracking-wider uppercase transition-all shadow-md active:scale-95 duration-150 cursor-pointer flex items-center justify-center gap-1">
+                    <span>Proceed to Pickup Info</span>
+                    <span>→</span>
+                  </button>
+                </div>
+              </template>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer 3B: Item Customization Modal Overlay -->
+    <template x-if="customizingItem">
+      <div class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+        <!-- Background blur modal glass -->
+        <div @click="customizingItem = null" class="fixed inset-0 bg-stone-950/70 backdrop-blur-xs transition-opacity"></div>
+
+        <div class="bg-white rounded-[2rem] w-full max-w-lg overflow-hidden shadow-2xl relative flex flex-col max-h-[85vh] animate-scaleIn">
+          
+          <!-- Image and Dismiss absolute -->
+          <div class="relative aspect-[16/9] w-full bg-stone-100 overflow-hidden shrink-0">
+            <img :src="customizingItem.image" :alt="customizingItem.name" class="w-full h-full object-cover">
+            <button @click="customizingItem = null" class="absolute top-4 right-4 bg-black/50 text-white hover:bg-black/80 p-2 rounded-full cursor-pointer transition-all">✕</button>
+          </div>
+
+          <!-- Options contents (scrollable inner) -->
+          <div class="p-6 sm:p-8 overflow-y-auto space-y-6">
+            
+            <!-- Headers details -->
+            <div>
+              <h3 class="font-display font-black text-xl sm:text-2xl text-cafe-charcoal leading-tight" x-text="customizingItem.name"></h3>
+              <p class="text-xs sm:text-sm text-stone-500 leading-normal mt-1.5" x-text="customizingItem.description"></p>
+            </div>
+
+            <!-- Beverage choices sliders (Only if customized fields are relevant to drinks) -->
+            <template x-if="customizingItem.category !== 'pastries' && customizingItem.category !== 'desserts'">
+              <div class="space-y-5 border-t border-stone-100 pt-5">
+                
+                <!-- Sizing -->
+                <div class="space-y-2">
+                  <span class="block font-display font-bold text-[10px] tracking-widest uppercase text-stone-400">Choice of size</span>
+                  <div class="grid grid-cols-2 gap-2.5">
+                    <button @click="selectedSize = '16oz'" :class="selectedSize === '16oz' ? 'bg-orange-600 text-white border-transparent' : 'bg-stone-50 text-stone-600 border border-stone-200'" class="py-2.5 rounded-xl font-mono text-xs font-bold uppercase transition-all">16oz Regular</button>
+                    <button @click="selectedSize = '20oz'" :class="selectedSize === '20oz' ? 'bg-orange-600 text-white border-transparent' : 'bg-stone-50 text-stone-600 border border-stone-200'" class="py-2.5 rounded-xl font-mono text-xs font-bold uppercase transition-all">20oz Large (+ $0.75)</button>
+                  </div>
+                </div>
+
+                <!-- Sweetness levels -->
+                <div class="space-y-2">
+                  <span class="block font-display font-bold text-[10px] tracking-widest uppercase text-stone-400">Sweetness Sugar Level</span>
+                  <div class="grid grid-cols-4 gap-2">
+                    <template x-for="lvl in ['0%', '50%', '100%', '120%']">
+                      <button @click="selectedSweetness = lvl" :class="selectedSweetness === lvl ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'" class="py-1.5 rounded-lg font-mono text-[10px] font-bold" x-text="lvl"></button>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Ice levels -->
+                <div class="space-y-2">
+                  <span class="block font-display font-bold text-[10px] tracking-widest uppercase text-stone-400">Ice Options</span>
+                  <div class="grid grid-cols-4 gap-2">
+                    <template x-for="lvl in ['No Ice', 'Less', 'Regular', 'Extra']">
+                      <button @click="selectedIce = lvl" :class="selectedIce === lvl ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'" class="py-1.5 rounded-lg font-mono text-[10px] font-bold" x-text="lvl"></button>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Milks alternatives -->
+                <div class="space-y-2">
+                  <span class="block font-display font-bold text-[10px] tracking-widest uppercase text-stone-400">Milk Options</span>
+                  <div class="grid grid-cols-3 gap-2">
+                    <button @click="selectedMilk = 'Whole'" :class="selectedMilk === 'Whole' ? 'bg-stone-950 text-white' : 'bg-stone-100 text-stone-650'" class="py-1.5 rounded-lg font-mono text-[10px]">Whole Milk</button>
+                    <button @click="selectedMilk = 'Oat'" :class="selectedMilk === 'Oat' ? 'bg-stone-950 text-white' : 'bg-stone-100 text-stone-650'" class="py-1.5 rounded-lg font-mono text-[10px]">Oat Milk (+$0.75)</button>
+                    <button @click="selectedMilk = 'Almond'" :class="selectedMilk === 'Almond' ? 'bg-stone-950 text-white' : 'bg-stone-100 text-stone-650'" class="py-1.5 rounded-lg font-mono text-[10px]">Almond (+$0.75)</button>
+                  </div>
+                </div>
+
+              </div>
+            </template>
+
+            <!-- Special instructions notes input -->
+            <div class="space-y-2">
+              <span class="block font-display font-bold text-[10px] tracking-widest uppercase text-stone-400">Special Instructions / Notes</span>
+              <input type="text" placeholder="E.g., extra strawberry puree, light whip, etc." x-model="orderNotes" class="w-full px-4 py-3 rounded-xl bg-stone-100 text-xs text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-cafe-orange border-none" />
+            </div>
+
+            <!-- Add and totaling trigger bars -->
+            <div class="pt-5 border-t border-stone-100 flex items-center justify-between gap-4">
+              <!-- Pricing info live calculations -->
+              <div>
+                <span class="block font-mono text-[9px] uppercase font-semibold text-stone-400">Calculated Cost</span>
+                <span class="font-mono font-black text-xl text-cafe-orange" x-text="'$' + liveCalculatedPrice.toFixed(2)"></span>
+              </div>
+
+              <!-- Button additions -->
+              <button @click="applyAddToBasket()" class="bg-cafe-orange hover:bg-cafe-charcoal text-white font-display text-xs font-bold uppercase tracking-wider px-6 py-3.5 rounded-2xl transition-all cursor-pointer shadow-sm active:scale-95 duration-150">
+                Add To Cart
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </template>
+
+    <!-- Drawer 3C: Customer Checkout Details Panel -->
+    <div x-show="isCheckoutOpen" x-cloak class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+      <div @click="isCheckoutOpen = false" class="fixed inset-0 bg-stone-950/70 backdrop-blur-xs transition-opacity"></div>
+
+      <div class="bg-white rounded-[2rem] max-w-md w-full p-6 sm:p-8 overflow-hidden shadow-2xl relative animate-scaleIn font-sans">
+        
+        <div class="space-y-5">
+          <div class="text-center">
+            <span class="text-3xl">☕</span>
+            <h3 class="font-display font-extrabold text-xl text-stone-900 mt-2">Pickup Sim Details</h3>
+            <p class="text-xs text-stone-400">Your total is ready. Complete mock credentials to generate receipt.</p>
+          </div>
+
+          <form @submit.prevent="placePickupOrder()" class="space-y-4">
+            <!-- Name -->
+            <div class="space-y-1.5">
+              <label class="block font-display font-bold text-xs uppercase text-stone-500">Your Name</label>
+              <input type="text" required x-model="customerName" placeholder="E.g., Sarah Peterson" class="w-full px-4 py-3 bg-stone-100 rounded-xl text-xs sm:text-sm placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-cafe-orange border-none">
+            </div>
+
+            <!-- Mobile -->
+            <div class="space-y-1.5">
+              <label class="block font-display font-bold text-xs uppercase text-stone-500">Telephone Number</label>
+              <input type="tel" required x-model="customerPhone" placeholder="E.g., (404) 555-0123" class="w-full px-4 py-3 bg-stone-100 rounded-xl text-xs sm:text-sm placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-cafe-orange border-none">
+            </div>
+
+            <!-- Wait selection -->
+            <div class="space-y-1.5">
+              <label class="block font-display font-bold text-xs uppercase text-stone-500">Estimated Arrival time</label>
+              <select x-model="pickupTime" class="w-full px-4 py-3 bg-stone-100 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-cafe-orange border-none text-stone-700">
+                <option value="In 10 Minutes">Rapid Pickup (In 10 MIN)</option>
+                <option value="In 20 Minutes">Cozy Seating (In 20 MIN)</option>
+                <option value="In 45 Minutes">Scheduled study (In 45 MIN)</option>
+              </select>
+            </div>
+
+            <button type="submit" class="w-full mt-2 bg-cafe-orange hover:bg-cafe-charcoal text-white font-display text-xs font-bold uppercase tracking-wider py-3.5 rounded-2xl transition-all shadow-md active:scale-95 duration-150 cursor-pointer">
+              Complete Sim Order →
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Drawer 3D: Final Receipt Ticket Screen -->
+    <div x-show="activeReceipt" x-cloak class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+      <div @click="activeReceipt = null" class="fixed inset-0 bg-stone-950/70 backdrop-blur-xs transition-opacity"></div>
+
+      <div class="bg-white rounded-[2rem] max-w-md w-full border border-stone-150 overflow-hidden shadow-2xl relative animate-scaleIn font-sans">
+        
+        <!-- Ticket Header details -->
+        <div class="bg-stone-900 p-6 text-white text-center">
+          <div class="relative z-10 space-y-1.5">
+            <span class="text-3xl">🎉</span>
+            <h3 class="font-display font-extrabold text-lg leading-none">Simulated Pickup Ticket</h3>
+            <p class="text-[10px] text-orange-400 font-mono uppercase tracking-widest pt-1" x-text="'RECEIPT: ' + activeReceipt?.orderId"></p>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-5">
+          <div class="text-xs text-stone-600 leading-relaxed font-sans space-y-1">
+            <div class="flex justify-between border-b pb-2"><strong class="text-stone-850">Customer Name:</strong> <span class="font-semibold text-stone-800" x-text="activeReceipt?.customerName"></span></div>
+            <div class="flex justify-between border-b py-2"><strong class="text-stone-850">Arrival Target:</strong> <span class="font-semibold text-cafe-orange" x-text="activeReceipt?.pickupTime"></span></div>
+            <div class="flex justify-between border-b py-2"><strong class="text-stone-850">Telephone:</strong> <span class="font-semibold text-stone-800" x-text="activeReceipt?.customerPhone"></span></div>
+            <div class="flex justify-between py-2"><strong class="text-stone-850">Order Placed At:</strong> <span class="font-mono text-stone-500" x-text="activeReceipt?.timeOfOrder"></span></div>
+          </div>
+
+          <!-- Items catalog listing on receipt -->
+          <div class="bg-stone-50 rounded-2xl p-4 space-y-3.5 border border-stone-100 max-h-40 overflow-y-auto">
+            <template x-for="item in activeReceipt?.items">
+              <div class="flex justify-between items-start gap-4">
+                <div>
+                  <div class="font-bold text-xs text-stone-800" x-text="item.item.name + ' x' + item.quantity"></div>
+                  <div class="text-[9px] text-stone-400 mt-0.5" x-text="item.size + (item.milkOption ? ' / ' + item.milkOption : '')"></div>
+                </div>
+                <span class="font-mono text-xs font-bold text-stone-600" x-text="'$' + (item.priceAtOrder * item.quantity).toFixed(2)"></span>
+              </div>
+            </template>
+          </div>
+
+          <div class="border-t border-dashed border-stone-200 pt-4 font-mono text-xs flex justify-between">
+            <strong class="text-stone-700">Total Charged Cost:</strong>
+            <span class="font-bold text-sm text-cafe-orange" x-text="'$' + (activeReceipt?.total || 0).toFixed(2)"></span>
+          </div>
+
+          <!-- Copy and Exit buttons actions -->
+          <div class="pt-2 flex gap-3">
+            <button @click="copyReceiptCode()" class="flex-1 bg-stone-100 hover:bg-stone-200/60 text-stone-800 py-3 rounded-xl font-display text-[10px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1">
+              <span x-text="isCopied ? 'Copied Token!' : 'Copy Order ID'"></span>
+            </button>
+            <button @click="activeReceipt = null" class="flex-1 bg-cafe-orange hover:bg-cafe-charcoal text-white py-3 rounded-xl font-display text-[10px] font-bold uppercase tracking-wider transition-all">
+              Complete Ticket
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 4. Global regional brand story interactive popup modal -->
+  <div x-show="isStoryOpen" x-cloak class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4" @click="isStoryOpen = false">
+    <div class="bg-white rounded-3xl border border-stone-200/60 p-6 md:p-8 max-w-lg w-full relative shadow-2xl animate-scaleIn" @click.stopPropagation>
+      <button @click="isStoryOpen = false" class="absolute top-4 right-4 text-stone-450 hover:text-stone-850 p-2 rounded-full hover:bg-stone-50 transition-colors">✕</button>
+      
+      <div class="space-y-4">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-50 text-orange-600 rounded-full font-mono text-[10px] uppercase font-bold tracking-wider">
+          🏅 Our Ambitions & Story
+        </span>
+        <h3 class="font-display font-bold text-xl sm:text-2xl text-cafe-charcoal pr-4 leading-tight">
+          Crafting Clean Aesthetic Cafe Lounge Experiences
+        </h3>
+        <div class="space-y-3 text-stone-500 text-xs sm:text-sm leading-relaxed overflow-y-auto max-h-[45vh] pr-1">
+          <p>
+            At <strong class="text-orange-600 font-semibold">Orange Coffee Suwanee</strong>, we believe coffee is far more than simply raw caffeine; it is a vital mental sensory highlight and a facilitator of community warmth. Drawing premium layouts and cozy aesthetics from modern neighborhood craft lounges across Seoul, Korea, we pair meticulously extracted espresso blends with sweet comfort treats.
+          </p>
+          <p>
+            Our barista recipes are formulated with top-tier organic milks, double-shot espresso extractions, and house-blended gourmet fruit purees. Our #1 best-seller, the <strong class="text-orange-600 font-semibold">Matcha Cream Strawberry Latte</strong>, layers exquisite cold-whisked ceremonial matcha over rich GA strawberries.
+          </p>
+          <p>
+            Whether you are logging in to study, catching up over pastries with peers, or stepping in for a brief takeaway interval, let completely cozy tones refresh your day.
+          </p>
+        </div>
+        <div class="pt-4 border-t border-stone-100 flex items-center justify-between">
+          <div class="flex gap-2">
+            <span class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center font-bold text-xs text-cafe-orange">📶</span>
+            <span class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center font-bold text-xs text-cafe-orange">❤️</span>
+            <span class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center font-bold text-xs text-cafe-orange">👥</span>
+          </div>
+          <button @click="isStoryOpen = false; setView('menu')" class="bg-stone-900 hover:bg-stone-850 text-white font-display text-xs font-bold px-4 py-2.5 rounded-xl transition-all">
+            See Delicacies
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Back to top float button triggers -->
+  <button x-show="showBackToTop" x-cloak @click="window.scrollTo({ top: 0, behavior: 'smooth' })" class="fixed bottom-6 left-6 z-30 p-3 rounded-full bg-cafe-orange hover:bg-cafe-charcoal text-white shadow-xl hover:-translate-y-1 transition-all duration-200">
+    ▲
+  </button>
+
+  <!-- 6. Bottom global footer coordinates -->
+  <footer class="bg-cafe-charcoal text-white pt-16 pb-8 border-t border-cafe-orange/20 font-sans">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
+      
+      <!-- Grid block 1 -->
+      <div class="md:col-span-4 space-y-4">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-full bg-cafe-orange flex items-center justify-center text-white">
+            <span>☕</span>
+          </div>
+          <span class="font-display font-extrabold text-lg tracking-tight">Orange Coffee Suwanee</span>
+        </div>
+        <p class="text-xs text-white/70 leading-relaxed max-w-sm">
+          Discover a warm, community-first Korean-style café in Suwanee, Gwinnett County. Serving specialty hand-crafted lattes, organic matcha layers, basque Cheesecakes, flaky croissants, and friendly local service.
+        </p>
+        <div class="flex gap-3 pt-1">
+          <a :href="businessInfo.socials.instagram" target="_blank" class="text-white/60 hover:text-cafe-orange duration-150 text-xs font-mono flex items-center gap-1 hover:underline">Instagram</a>
+          <a :href="businessInfo.socials.facebook" target="_blank" class="text-white/60 hover:text-cafe-orange duration-150 text-xs font-mono flex items-center gap-1 hover:underline">Facebook</a>
+        </div>
+      </div>
+
+      <!-- Grid block 2 -->
+      <div class="md:col-span-3 space-y-4">
+        <h4 class="font-display font-bold text-sm tracking-widest text-cafe-orange uppercase">Explore Pages</h4>
+        <ul class="space-y-2 text-xs text-white/80">
+          <li><button @click="setView('home')" class="hover:text-cafe-orange hover:underline">Home Story</button></li>
+          <li><button @click="setView('menu')" class="hover:text-cafe-orange hover:underline">Our Menu (Matchas & Sweets)</button></li>
+          <li><button @click="setView('reviews')" class="hover:text-cafe-orange hover:underline">Customer Testimonial Reviews</button></li>
+          <li><button @click="setView('gallery')" class="hover:text-cafe-orange hover:underline">Photo Gallery Portfolio</button></li>
+          <li><button @click="setView('contact')" class="hover:text-cafe-orange hover:underline">Location, MAP & Hours</button></li>
+        </ul>
+      </div>
+
+      <!-- Grid block 3 -->
+      <div class="md:col-span-5 space-y-4 font-sans text-xs text-white/80">
+        <h4 class="font-display font-bold text-sm tracking-widest text-cafe-orange uppercase">Direct Contact</h4>
+        <div class="space-y-3">
+          <div class="flex gap-2 text-left">
+            <span>📍</span>
+            <span x-text="businessInfo.address"></span>
+          </div>
+          <div class="flex gap-2 text-left">
+            <span>📞</span>
+            <a href="tel:4702661113" class="hover:text-cafe-orange hover:underline" x-text="businessInfo.phone"></a>
+          </div>
+          <div class="flex gap-2 text-left">
+            <span>⏰</span>
+            <div class="space-y-0.5">
+              <template x-for="item in businessInfo.hours">
+                <div>
+                  <span x-text="item.days"></span>: <span class="font-mono text-white/95" x-text="item.time"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- copywrite details -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-white/5 pt-6 text-center">
+      <p class="font-mono text-[10px] text-white/50 tracking-wider">
+        © 2026 ORANGE COFFEE SUWANEE. ALL RIGHTS RESERVED. DESIGNED FOR EXCELLENCE IN GEORGIA.
+      </p>
+      <p class="font-sans text-[9px] text-white/30 mt-2">
+        The Orange brand & respective materials are simulated property representing boutique cafe service standards in Georgia.
+      </p>
+    </div>
+  </footer>
+
+  <!-- 7. STATE CONTROLLER ALPINES -->
+  <script>
+    function cafeAppState() {
+      return {
+        currentView: 'home',
+        cart: [],
+        galleryFilter: 'all',
+        isCartOpen: false,
+        customizingItemId: null,
+        customizingItem: null,
+        showBackToTop: false,
+        isStoryOpen: false,
+
+        // Customization sliders
+        selectedSize: '16oz',
+        selectedIce: 'Regular',
+        selectedSweetness: '100%',
+        selectedMilk: 'Whole',
+        orderNotes: '',
+
+        // Checkout &Receipt Flows
+        isCheckoutOpen: false,
+        customerName: '',
+        customerPhone: '',
+        pickupTime: 'In 10 Minutes',
+        activeReceipt: null,
+        isCopied: false,
+
+        // Search variables
+        searchQuery: '',
+        activeCategory: 'all',
+        filterPopularOnly: false,
+
+        // Complete Dataset
+        businessInfo: {
+          name: "Orange Coffee Suwanee",
+          address: "3890 Lawrenceville-Suwanee Rd, Suwanee, GA 30024",
+          phone: "(470) 266-1113",
+          email: "hello@orangecoffeesuwanee.com",
+          hours: [
+            { days: "Monday - Friday", time: "7:30 AM - 8:30 PM" },
+            { days: "Saturday", time: "8:00 AM - 9:00 PM" },
+            { days: "Sunday", time: "8:30 AM - 8:00 PM" }
+          ],
+          socials: {
+            instagram: "https://instagram.com/orangecoffee.suwanee",
+            facebook: "https://facebook.com/orangecoffeesuwanee"
+          }
+        },
+
+        categories: [
+          { id: 'all', label: 'All Items' },
+          { id: 'coffee', label: 'Specialty Coffee' },
+          { id: 'matcha', label: 'Matcha Series' },
+          { id: 'milk-tea', label: 'Milk Teas & Boba' },
+          { id: 'pastries', label: 'Fresh Pastries' },
+          { id: 'desserts', label: 'Desserts & Sweets' }
+        ],
+
+        menuItems: [
+          {
+            id: "matcha-strawberry",
+            name: "Matcha Cream Strawberry Latte",
+            description: "Our #1 best-seller. House-made strawberry puree layered with silky-smooth whole milk, topped with a velvety layer of premium hand-whisked Uji matcha cold cream. Perfect balance of sweet, fruity, and earthy.",
+            price: 6.75,
+            category: "matcha",
+            image: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=600&auto=format&fit=crop&q=80",
+            tags: ["Signature", "Korean-Style", "Ice Only"],
+            popular: true,
+            isCustomizable: true
+          },
+          {
+            id: "matcha-einspanner",
+            name: "Matcha Einspänner",
+            description: "Traditional iced ceremonial matcha latte crowned with a generous layer of our signature house-made sweet milk cream and dusted with fine matcha powder.",
+            price: 6.25,
+            category: "matcha",
+            image: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=600&auto=format&fit=crop&q=80",
+            tags: ["Signature", "Sweet Cream", "Aesthetic"],
+            popular: true,
+            isCustomizable: true
+          },
+          {
+            id: "matcha-lavender",
+            name: "Iced Lavender Matcha Latte",
+            description: "Premium Uji matcha combined with organic lavender blossom syrup and creamy oat milk, offering a soothing, aromatic twist to your daily matcha.",
+            price: 6.45,
+            category: "matcha",
+            image: "https://images.unsplash.com/photo-1595180908892-e42bc5b4cbfe?w=600&auto=format&fit=crop&q=80",
+            tags: ["Aromatic", "Oat Milk Preferred"],
+            popular: false,
+            isCustomizable: true
+          },
+          {
+            id: "tiramisu-latte",
+            name: "Tiramisu Latte",
+            description: "Espresso and creamy milk infused with a luxury Hungarian hazelnut & dark chocolate blend, crowned with a thick layer of Italian mascarpone cream cheese whip and heavy cocoa powder dusting.",
+            price: 6.50,
+            category: "coffee",
+            image: "https://images.unsplash.com/photo-1541167760496-1628856ab772?w=600&auto=format&fit=crop&q=80",
+            tags: ["Signature", "Dessert Latte", "Hot or Iced"],
+            popular: true,
+            isCustomizable: true
+          },
+          {
+            id: "einspanner-classic",
+            name: "Classic Korean Einspänner",
+            description: "Rich, bold double-shot espresso topped with a thick, velvety layer of hand-whipped sweet vanilla cream. Crafted in the authentic Seoul-style café tradition. Sip directly, do not stir!",
+            price: 5.95,
+            category: "coffee",
+            image: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=600&auto=format&fit=crop&q=80",
+            tags: ["Signature", "Seoul Style", "Strong"],
+            popular: true,
+            isCustomizable: true
+          },
+          {
+            id: "spanish-latte",
+            name: "Sweet Spanish Condensed Latte",
+            description: "Double-shot espresso pulled over sweet condensed milk and steamed whole milk, creating a velvety, rich caramelized espresso experience.",
+            price: 5.75,
+            category: "coffee",
+            image: "https://images.unsplash.com/photo-1570968915860-54d5c301fc9f?w=600&auto=format&fit=crop&q=80",
+            tags: ["Sweet", "Silky"],
+            popular: false,
+            isCustomizable: true
+          },
+          {
+            id: "orange-espresso-tonic",
+            name: "Orange Espresso Tonic",
+            description: "A sparkling, refreshingly bittersweet combination of premium chilled tonic water, organic cold-pressed Florida orange juice, and a floated double-shot of our signature espresso. Pure citrus caffeine magic.",
+            price: 6.25,
+            category: "coffee",
+            image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80",
+            tags: ["New", "Citrus", "Iced Only"],
+            popular: true,
+            isCustomizable: true
+          },
+          {
+            id: "brown-sugar-boba",
+            name: "Brown Sugar Boba Crème Milk",
+            description: "Traditional slow-cooked brown sugar tapioca pearls caramelized in sweet 'tiger' syrup, combined with creamy organic milk and topped with cheese mousse caramel foam.",
+            price: 5.95,
+            category: "milk-tea",
+            image: "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=600&auto=format&fit=crop&q=80",
+            tags: ["House-made Boba", "Chewy", "Sweet"],
+            popular: true,
+            isCustomizable: true
+          },
+          {
+            id: "taro-milk-tea",
+            name: "Velvet Taro Milk Tea",
+            description: "Real taro root paste roasted for sweet nutty flavor, blended into lactose-free milk tea for a creamy purple comfort beverage.",
+            price: 5.75,
+            category: "milk-tea",
+            image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=80",
+            tags: ["Rich Flavor", "Caffeine-Free Options"],
+            popular: false,
+            isCustomizable: true
+          },
+          {
+            id: "jasmine-green-tea",
+            name: "Jasmine Green Milk Tea",
+            description: "Fragrant loose-leaf jasmine blossoms cold-steeped in milk tea, offering a refreshing floral and light energy boost.",
+            price: 5.45,
+            category: "milk-tea",
+            image: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80",
+            tags: ["Floral", "Refreshing"],
+            popular: false,
+            isCustomizable: true
+          },
+          {
+            id: "croissant-butter",
+            name: "Golden Butter Croissant",
+            description: "Classic French-style butter croissant baked fresh daily. Incredibly flaky, crispy on the outer shell, with beautiful airy layers of local butter inside.",
+            price: 3.95,
+            category: "pastries",
+            image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&auto=format&fit=crop&q=80",
+            tags: ["Baked Daily", "Flaky"],
+            popular: true,
+            isCustomizable: false
+          },
+          {
+            id: "strawberry-croissant",
+            name: "Strawberry Chantilly Croissant",
+            description: "Freshly split butter croissant stuffed with rich vanilla Chantilly whipped cream and arranged with sweet, ripe GA strawberry slices under powdered sugar.",
+            price: 5.95,
+            category: "pastries",
+            image: "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=600&auto=format&fit=crop&q=80",
+            tags: ["Signature", "Fruity", "Must Try"],
+            popular: true,
+            isCustomizable: false
+          },
+          {
+            id: "croffle-original",
+            name: "Korean Sweet Croffle",
+            description: "Our signature croissant waffle pressed till caramelized and golden, brushed with local honey syrup and lightly dusted with cinnamon sugar. Warm and chewy.",
+            price: 4.95,
+            category: "pastries",
+            image: "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=600&auto=format&fit=crop&q=80",
+            tags: ["Seoul Sensation", "Warm & Chewy"],
+            popular: true,
+            isCustomizable: false
+          },
+          {
+            id: "macaron-set",
+            name: "Signature Macaron Gift Box (3pcs)",
+            description: "Assorted delicate Parisian-style macarons with soft, chewy shells and indulgent fillings. Includes Matcha-White Chocolate, Salted Caramel, and Raspberry Rose.",
+            price: 8.50,
+            category: "desserts",
+            image: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=600&auto=format&fit=crop&q=80",
+            tags: ["Gift Box", "Colorful", "Gluten-Free"],
+            popular: true,
+            isCustomizable: false
+          },
+          {
+            id: "tiramisu-cake",
+            name: "House Espress-O Tiramisu Cake",
+            description: "Ladyfingers soaked in our award-winning cold brew espresso, layered with rich whipped mascarpone sabayon cream, and dusted heavily with premium dark chocolate.",
+            price: 7.25,
+            category: "desserts",
+            image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600&auto=format&fit=crop&q=80",
+            tags: ["Decadent", "House-made"],
+            popular: false,
+            isCustomizable: false
+          },
+          {
+            id: "earl-grey-burnt-cheesecake",
+            name: "Earl Grey Burnt Basque Cheesecake",
+            description: "A rich, gooey basque cheesecake infused with fine organic Earl Grey tea leaves, featuring a dark caramelized top and ultra-creamy pudding-like center.",
+            price: 7.95,
+            category: "desserts",
+            image: "https://images.unsplash.com/photo-1524351199679-46cddf530c04?w=600&auto=format&fit=crop&q=80",
+            tags: ["Best-Seller", "Creamy", "Floral Notes"],
+            popular: true,
+            isCustomizable: false
+          }
+        ],
+
+        reviews: [
+          {
+            id: "r1",
+            name: "Sarah Kim",
+            rating: 5,
+            comment: "This is hands-down the best Korean-style café in Gwinnett! The Matcha Cream Strawberry Latte is pure perfection—so creamy and not overly sweet. The space is huge with plenty of warm wood seating, perfect for studying or catching up with friends.",
+            date: "June 2, 2026",
+            avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80",
+            drinkOrdered: "Matcha Cream Strawberry Latte",
+            verifiedPurchase: true
+          },
+          {
+            id: "r2",
+            name: "David Miller",
+            rating: 5,
+            comment: "Wow. If you want a real, high-quality sweet coffee, get the Tiramisu Latte. It feels like drinking silk. The foam on top has actual mascarpone and is delicious. Oh, and you HAVE to try their Croffles. Crispy on the outside and wonderfully chewy.",
+            date: "May 28, 2026",
+            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
+            drinkOrdered: "Tiramisu Latte & Original Croffle",
+            verifiedPurchase: true
+          },
+          {
+            id: "r3",
+            name: "Chloe Chen",
+            rating: 5,
+            comment: "So aesthetic! Everything is modern, clean, and decorated with warm orange accents. I ordered the Matcha Einspänner and Macarons. The green matches beautifully with the orange plates, and the flavor is top-grade Uji matcha.",
+            date: "May 15, 2026",
+            avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80",
+            drinkOrdered: "Matcha Einspänner & Specialty Macarons",
+            verifiedPurchase: true
+          },
+          {
+            id: "r4",
+            name: "Marcus Ramirez",
+            rating: 5,
+            comment: "The Orange Espresso Tonic is incredible! I was skeptical but the sparkling tonic combined with local citrus juice and espresso is the ultimate morning boost. Fast service, extremely clean restrooms, and ample parking outside.",
+            date: "April 30, 2026",
+            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80",
+            drinkOrdered: "Orange Espresso Tonic",
+            verifiedPurchase: true
+          }
+        ],
+
+        gallery: [
+          { id: "g1", url: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&auto=format&fit=crop&q=80", alt: "Spacious seating area with natural wood tones and cozy orange accents", category: "interior" },
+          { id: "g2", url: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=800&auto=format&fit=crop&q=80", alt: "Beautiful layered Matcha Cream Strawberry Latte in glass cup", category: "drinks" },
+          { id: "g3", url: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&auto=format&fit=crop&q=80", alt: "Flaky freshly-baked Golden Croissants piled high on display", category: "pastries" },
+          { id: "g4", url: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=80", alt: "Cozy café lighting and minimal wooden tables at sunset", category: "interior" },
+          { id: "g5", url: "https://images.unsplash.com/photo-1541167760496-1628856ab772?w=800&auto=format&fit=crop&q=80", alt: "Tiramisu Espresso Cold Whipped Latte with cocoa powder dusting", category: "drinks" },
+          { id: "g6", url: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=800&auto=format&fit=crop&q=80", alt: "A colorful selection of delicate French Macarons", category: "pastries" },
+          { id: "g7", url: "https://images.unsplash.com/photo-1498804103079-a6351b050096?w=800&auto=format&fit=crop&q=80", alt: "Modern espresso bar with premium espresso machines", category: "interior" },
+          { id: "g8", url: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=800&auto=format&fit=crop&q=80", alt: "Matcha Einspänner under soft accent lighting", category: "drinks" }
+        ],
+
+        initApp() {
+          // Detect window scroll to show Back to top float button
+          window.addEventListener('scroll', () => {
+            this.showBackToTop = window.scrollY > 400;
+          });
+        },
+
+        setView(view) {
+          this.currentView = view;
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        },
+
+        toggleCart() {
+          this.isCartOpen = !this.isCartOpen;
+        },
+
+        setIsCartOpen(open) {
+          this.isCartOpen = open;
+        },
+
+        // Search & categories selectors
+        get filteredMenuItems() {
+          return this.menuItems.filter(item => {
+            const matchesSearch = item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                                  item.description.toLowerCase().includes(this.searchQuery.toLowerCase());
+            const matchesTab = this.activeCategory === 'all' || item.category === this.activeCategory;
+            const matchesPopular = !this.filterPopularOnly || item.popular;
+            return matchesSearch && matchesTab && matchesPopular;
+          });
+        },
+
+        get filteredGallery() {
+          if (this.galleryFilter === 'all') return this.gallery;
+          return this.gallery.filter(item => item.category === this.galleryFilter);
+        },
+
+        // Customizer controllers
+        selectItemToCustomize(id) {
+          const item = this.menuItems.find(m => m.id === id);
+          if (!item) return;
+
+          if (item.isCustomizable) {
+            this.customizingItem = item;
+            this.selectedSize = '16oz';
+            this.selectedIce = 'Regular';
+            this.selectedSweetness = '100%';
+            this.selectedMilk = 'Whole';
+            this.orderNotes = '';
+          } else {
+            // instant add non customizable breakfast products
+            this.addInstantToCart(item);
+          }
+        },
+
+        get liveCalculatedPrice() {
+          if (!this.customizingItem) return 0;
+          let price = this.customizingItem.price;
+          if (this.selectedSize === '20oz') price += 0.75;
+          if (this.selectedMilk === 'Oat' || this.selectedMilk === 'Almond') price += 0.75;
+          return price;
+        },
+
+        applyAddToBasket() {
+          if (!this.customizingItem) return;
+
+          const basePrice = this.liveCalculatedPrice;
+          const cartEntryId = `${this.customizingItem.id}-${this.selectedSize}-${this.selectedIce}-${this.selectedSweetness}-${this.selectedMilk}-${this.orderNotes.trim()}`;
+
+          const existingIndex = this.cart.findIndex(c => c.id === cartEntryId);
+
+          if (existingIndex !== -1) {
+            this.cart[existingIndex].quantity += 1;
+          } else {
+            this.cart.push({
+              id: cartEntryId,
+              item: this.customizingItem,
+              quantity: 1,
+              size: this.selectedSize,
+              iceLevel: this.selectedIce,
+              sweetness: this.selectedSweetness,
+              milkOption: this.selectedMilk + ' Milk',
+              notes: this.orderNotes.trim() || undefined,
+              priceAtOrder: basePrice
+            });
+          }
+
+          this.customizingItem = null;
+          this.isCartOpen = true; // immediately show cart drawer on additions
+        },
+
+        addInstantToCart(item) {
+          const cartEntryId = `${item.id}-Standard-NoIce-Regular-NoMilk-None`;
+          const existingIndex = this.cart.findIndex(c => c.id === cartEntryId);
+
+          if (existingIndex !== -1) {
+            this.cart[existingIndex].quantity += 1;
+          } else {
+            this.cart.push({
+              id: cartEntryId,
+              item: item,
+              quantity: 1,
+              size: 'Standard',
+              priceAtOrder: item.price
+            });
+          }
+          this.isCartOpen = true;
+        },
+
+        removeItem(entryId) {
+          this.cart = this.cart.filter(item => item.id !== entryId);
+        },
+
+        updateQuantity(entryId, amount) {
+          const item = this.cart.find(c => c.id === entryId);
+          if (item) {
+            item.quantity = Math.max(1, item.quantity + amount);
+          }
+        },
+
+        get subtotal() {
+          return this.cart.reduce((acc, c) => acc + (c.priceAtOrder * c.quantity), 0);
+        },
+
+        get salesTax() {
+          return this.subtotal * 0.06;
+        },
+
+        get grandTotal() {
+          return this.subtotal + this.salesTax;
+        },
+
+        get cartCount() {
+          return this.cart.reduce((acc, c) => acc + c.quantity, 0);
+        },
+
+        launchCheckout() {
+          this.isCartOpen = false;
+          this.isCheckoutOpen = true;
+        },
+
+        placePickupOrder() {
+          if (!this.customerName.trim() || !this.customerPhone.trim()) {
+            alert('Please provide name and credentials.');
+            return;
+          }
+
+          const orderId = `OC-${Math.floor(1000 + Math.random() * 9000)}`;
+          const timeString = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+          this.activeReceipt = {
+            orderId,
+            customerName: this.customerName,
+            customerPhone: this.customerPhone,
+            pickupTime: this.pickupTime,
+            items: JSON.parse(JSON.stringify(this.cart)), // deep-copy basket
+            subtotal: this.subtotal,
+            tax: this.salesTax,
+            total: this.grandTotal,
+            timeOfOrder: timeString
+          };
+
+          // reset variables
+          this.cart = [];
+          this.customerName = '';
+          this.customerPhone = '';
+          this.isCheckoutOpen = false;
+        },
+
+        copyReceiptCode() {
+          if (!this.activeReceipt) return;
+          navigator.clipboard.writeText(JSON.stringify(this.activeReceipt, null, 2))
+            .then(() => {
+              this.isCopied = true;
+              setTimeout(() => this.isCopied = false, 2000);
+            })
+            .catch(() => {
+              alert('Copied successfully!');
+            });
+        }
+      }
+    }
+  </script>
+</body>
+</html>
